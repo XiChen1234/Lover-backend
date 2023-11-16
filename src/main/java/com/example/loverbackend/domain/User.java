@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.Length;
 public class User {
     @TableId
     private Integer id;
-    @Email(message = "用户名格式不正确")
+    @Email(message = "邮箱格式不正确")
     private String username;
     @Length(min = 6, max = 20, message = "密码格式不正确")
     private String password;
