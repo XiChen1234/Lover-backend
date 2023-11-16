@@ -1,1 +1,16 @@
+server:
+  port: 8080
 
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/lover?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  thymeleaf:
+    check-template-location: false
+  mail:
+    host: smtp.qq.com
+    username: xichen.public@foxmail.com
+    password: hophcxabmdulbhae
+    default-encoding: UTF-8
