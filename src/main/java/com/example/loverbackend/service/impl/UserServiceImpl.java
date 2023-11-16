@@ -19,8 +19,10 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private EmailUtil emailUtil;
+
     /**
      * 登录
+     *
      * @param username 用户名
      * @param password 用户密码
      * @return 返回用户id
@@ -37,8 +39,10 @@ public class UserServiceImpl implements UserService {
 
 
     private static final int OUT_TIME = 5 * 60 * 1000; // 5min
+
     /**
      * 发送验证码
+     *
      * @param email 目标邮箱
      * @return 返回信息
      */
@@ -49,14 +53,14 @@ public class UserServiceImpl implements UserService {
         queryWrapper.lambda().eq(User::getUsername, email);
         User user = userMapper.selectOne(queryWrapper);
 
-        if(user != null) {
+        if (user != null) {
             return CommonResponse.creatForErrorMessage("该邮箱已注册，请直接登录");
         }
 
         // 发邮件
         String code = CaptchaUtil.getCode();
         boolean flag = emailUtil.sendMail(email, code);
-        if(!flag) {
+        if (!flag) {
             return CommonResponse.creatForFailMessage("注册失败，邮箱验证码发送失败");
         }
 
@@ -65,7 +69,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(email);
         user.setCaptcha(code);
         int result = userMapper.insert(user);
-        if(result == 0) {
+        if (result == 0) {
             return CommonResponse.creatForFailMessage("注册失败，数据库保存失败");
         }
 
@@ -83,16 +87,35 @@ public class UserServiceImpl implements UserService {
 
         return CommonResponse.creatForSuccessMessage("验证码发送成功");
     }
+
     /**
      * 注册
-     * @param email 邮箱（作为账号）
-     * @param password 密码
-     * @param captcha 验证码
-     * @return 返回信息exit
      *
+     * @param email    邮箱（作为账号）
+     * @param password 密码
+     * @param captcha  验证码
+     * @return 返回信息exit
      */
     @Override
     public CommonResponse<String> register(String email, String password, String captcha) {
-        return null;
+        // 校验验证码
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(User::getUsername, email).eq(User::getCaptcha, captcha);
+        User user = userMapper.selectOne(queryWrapper);
+
+        if (user == null) {
+            // 无匹配信息
+            return CommonResponse.creatForErrorMessage("验证码错误");
+        }
+
+        // 新建用户
+        user.setPassword(password);
+        user.setCaptcha("");
+        int result = userMapper.updateById(user);
+        if (result == 0) {
+            return CommonResponse.creatForFailMessage("注册失败，数据库保存失败");
+        }
+
+        return CommonResponse.creatForSuccessMessage("注册成功");
     }
 }

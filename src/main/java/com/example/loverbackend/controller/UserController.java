@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public CommonResponse<String> register() {
-        return null;
+    public CommonResponse<String> register(@Valid @RequestBody User user) {
+        return userService.register(user.getUsername(), user.getPassword(), user.getCaptcha());
     }
 }
